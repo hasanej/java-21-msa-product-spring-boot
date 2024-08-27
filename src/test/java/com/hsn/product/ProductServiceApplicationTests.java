@@ -1,7 +1,6 @@
 package com.hsn.product;
 
 import io.restassured.RestAssured;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,7 +9,8 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.context.annotation.Import;
 import org.testcontainers.containers.MongoDBContainer;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 
 @Import(TestcontainersConfiguration.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -32,7 +32,7 @@ class ProductServiceApplicationTests {
     }
 
     @Test
-    void shouldCreateProduct() {
+    void createProductTest() {
         String request = """
                 {
                 	"name": "Product 1",
@@ -48,9 +48,11 @@ class ProductServiceApplicationTests {
                 .post("/api/product")
                 .then()
                 .statusCode(201)
-                .body("id", Matchers.notNullValue())
-                .body("name", Matchers.equalTo("Product 1"))
-                .body("description", Matchers.equalTo("This is Product 1."))
-                .body("price", Matchers.equalTo(1000000));
+                .body(
+                        "id", notNullValue(),
+                        "name", equalTo("Product 1"),
+                        "description", equalTo("This is Product 1."),
+                        "price", equalTo(1000000)
+                );
     }
 }
